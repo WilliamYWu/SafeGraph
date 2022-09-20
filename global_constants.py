@@ -1,7 +1,7 @@
 from datetime import datetime
 
-MAIN_DIR = 'E:\\Python_Projects\\Research\\Safegraph'
-DATA_DIR = MAIN_DIR + '\\Generalized_Processing_Data'
+MAIN_DIR = 'D:\\Code\\Safegraph_Project'
+DATA_DIR = MAIN_DIR + '\\SG_Data'
 
 SPEND_PATTERNS = DATA_DIR + '\\spend_patterns'
 TRANSACTION_PANEL_SUMMARY = DATA_DIR + '\\transaction_panel_summary'

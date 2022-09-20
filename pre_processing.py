@@ -9,40 +9,12 @@ import gc
 import time
 import ast
 
-def memory_usage():
-    process = psutil.Process(os.getpid())
-    return process.memory_info()[0] / float(2 ** 10)
-
-def clean(df):
-    del df
-    gc.collect()
-    df = pd.DataFrame()
-    return df
-
-def directory_setup(dir_list):
-    for directory in dir_list:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-def logging_setup():
-    try:
-        logger = logging.getLogger('app')
-        level = logging.DEBUG
-        logger.setLevel(level)
-        handler = logging.FileHandler(LOG_FILE)
-        handler.setFormatter(logging.Formatter(fmt='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M%S'))       
-        handler.setLevel(level)
-        logger.addHandler(handler)
-    except Exception as e:
-        exit
-
 def processing_dataset(filepaths, output_directory, need_processing):
     logger = logging.getLogger('app')
     try:
         if need_processing:
             start = time.time()
             logger.info(f"Time Taken: {time.time()-start} seconds")
-            logger.info(f"MEMORY USAGE -> START -> processing_dataset: {memory_usage()}")
             for file in filepaths:
                 name_split = file_name_preprocessing(file)
                 file_output = output_directory + f'\\{name_split[0]}-{name_split[1]}-{name_split[3]}.csv'
@@ -63,7 +35,6 @@ def processing_dataset(filepaths, output_directory, need_processing):
 
                 raw_df = dictionary_preprocess(raw_df, normal_dict_preprocess_list)
                 raw_df.to_csv(file_output)
-            logger.info(f"MEMORY USAGE -> END -> processing_dataset: {memory_usage()}")
     except Exception as e:
         logging.error(f"Failed to process dataset: {e}")
 

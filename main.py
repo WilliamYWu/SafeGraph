@@ -10,7 +10,7 @@ import logging.handlers
 import pyarrow as pa
 import pyarrow.parquet as pq
 import time
-import threading
+import concurrent.futures
 import sys
 import fastai.tabular.core
 import warnings
@@ -19,6 +19,7 @@ import warnings
 # region: functions
 def suppress_warnings():
     warnings.filterwarnings("ignore")
+
 
 def unzip_gz_files(dir, filetype, unzip_gz):
     logger = logging.getLogger('app')
@@ -163,21 +164,20 @@ def main():
     convert = True
     run_naics = True
     run_groupby_naics = True
-    pool = multiprocessing.Pool(1)
 
     suppress_warnings()
-    pool.starmap(unzip_gz_files,[(MAIN_DIR, '.gz', run_unzip_gz)])
-    raw_csv_list = pool.starmap(create_file_list,[(SPEND_PATTERNS, '.csv')])[0]
-    processing_dataset(raw_csv_list, STAGING_0_INPUT, preprocess)
-    print('Done')
-    pool.starmap(processing_dataset, [(raw_csv_list, STAGING_0_INPUT, preprocess)])
-    processed_csv_list = create_file_list(STAGING_0_INPUT, '.csv')[0]
-    pool.starmap(convert_to_parquet,[(processed_csv_list, convert)])
-    parquet_file_list = pool.starmap(create_file_list, [(STAGING_1_INPUT,'.parquet')])[0]
-    naics_output_path = STAGING_1_OUTPUT + '\\naics_list.parquet'
-    pool.starmap(naics_filter_dataset,[(parquet_file_list, {'naics_code':'category'}, naics_output_path, run_naics)])
-    pool.starmap(groupby_naics,[(naics_output_path, STAGING_2_OUTPUT, parquet_file_list, run_groupby_naics)])
-    print('Script is done')
+    # unzip_gz_files(MAIN_DIR, '.gz', run_unzip_gz)
+    # raw_csv_list = create_file_list(SPEND_PATTERNS, '.csv')
+    # processing_dataset(raw_csv_list, STAGING_0_INPUT, preprocess)
+    # print('Done')
+    # processing_dataset(raw_csv_list, STAGING_0_INPUT, preprocess)
+    # processed_csv_list = create_file_list(STAGING_0_INPUT, '.csv')[0]
+    # convert_to_parquet,[(processed_csv_list, convert)
+    # parquet_file_list = create_file_list(STAGING_1_INPUT,'.parquet')[0]
+    # naics_output_path = STAGING_1_OUTPUT + '\\naics_list.parquet'
+    # naics_filter_dataset(parquet_file_list, {'naics_code':'category'}, naics_output_path, run_naics))
+    # pool.starmap(groupby_naics,[(naics_output_path, STAGING_2_OUTPUT, parquet_file_list, run_groupby_naics)])
+    # print('Script is done')
 
 dir_list = [CLEANED_DATA_DIR, STAGING_0_INPUT, STAGING_1_INPUT, STAGING_1_OUTPUT, STAGING_2_OUTPUT, STAGING_3_INPUT]
 directory_setup(dir_list)
