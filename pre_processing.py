@@ -1,57 +1,32 @@
 from global_constants import *
+from global_methods import *
+
 from concurrent.futures import ThreadPoolExecutor
 import os
-from functools import wraps 
 from itertools import repeat
 import pandas as pd
-import psutil
 import logging
 import logging.handlers
-import gc
-import time
 import re
+import gzip
+import shutil
 import json
 
-# region: quality of life
-def timeit_memoryusage(method):
-    @wraps(method)
-    def wrapper(*args, **kwargs):
-        process = psutil.Process(os.getpid())
-        start_memory = process.memory_info().rss
-        start_time = time.time()
-        result = method(*args, **kwargs)
-        end_time = time.time()
-        end_memory = process.memory_info().rss
-        logging.info(f"{method.__name__} Time Taken => {(end_time-start_time)*1000} ms")
-        logging.info(f"{method.__name__} Memory Used => {(end_memory-start_memory)} bytes")
-        return result
-    return wrapper
-
-def clean(df):
-    del df
-    gc.collect()
-    df = pd.DataFrame()
-    return df
-
-def directory_setup(dir_list):
-    for directory in dir_list:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-def logging_setup():
-    try:
-      handler = logging.handlers.WatchedFileHandler(os.environ.get("LOGFILE", LOG_FILE))
-      formatter = logging.Formatter(fmt="%(asctime)s %(levelname)-8s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
-      handler.setFormatter(formatter)
-      logging.getLogger().handlers.clear()
-      root = logging.getLogger()
-      root.setLevel(os.environ.get("LOGLEVEL", "INFO"))
-      root.addHandler(handler)
-      logging.propogate = False
-      logging.info("Log File was created successfully.")
-    except Exception as e:
-        exit
-# endregion: quality of life
+def unzip_one_gz(file):
+    current_folder_dir = file.rsplit('\\',maxsplit=1)[0]
+    os.chdir(current_folder_dir)
+    without_gz_file_name = file.replace(".gz",'')
+    with gzip.open(file, 'r') as file_in:
+        with open(without_gz_file_name, 'wb') as file_out: 
+            shutil.copyfileobj(file_in, file_out)
+        file_out.close()
+    file_in.close()
+    
+@timeit_memoryusage
+def unzip_all_gz(paths, run):
+    if run:
+        with ThreadPoolExecutor(max_workers=10) as pool:
+            result = pool.map(unzip_one_gz, paths)
 
 @timeit_memoryusage
 def processing_all_files(paths, output_directory, run):
