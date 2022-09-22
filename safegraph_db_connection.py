@@ -4,7 +4,7 @@ import pyodbc
 import mysql.connector as mysql
 from mysql.connector import Error
 
-def create_daatbase():
+def create_database():
     try:
         conn = mysql.connect(
             host = "localhost", 
@@ -77,3 +77,23 @@ def create_raw_table():
             )''')
     except Exception as e:
             logging.error("Failed to connect to SQL Database.")
+
+def from_file_populate_table(file, table):
+    print(file)
+    mydb = mysql.connect(
+        host = "localhost", 
+        database = 'safegraph_db',
+        user = "root",
+        password = "Sbh123ql46!#"
+    )
+    cursor = mydb.cursor()
+    try:
+        csv_df = pd.read_csv(file, engine='c', on_bad_lines='skip').fillna('NA')
+    except Exception as e:
+        logging.error(f'Error on: {file}: {e}')
+    csv_df = clean(csv_df)
+    sql = f"INSERT IGNORE INTO safegraph_db.{table} VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" 
+    for i, row in csv_df.iterrows():
+        cursor.execute(sql, tuple(row))
+        mydb.commit()
+
