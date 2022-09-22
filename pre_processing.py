@@ -1,9 +1,8 @@
 from global_constants import *
 from global_methods import *
 
-from concurrent.futures import ThreadPoolExecutor
+
 import os
-from itertools import repeat
 import pandas as pd
 import logging
 import logging.handlers
@@ -21,18 +20,6 @@ def unzip_one_gz(file):
             shutil.copyfileobj(file_in, file_out)
         file_out.close()
     file_in.close()
-    
-@timeit_memoryusage
-def unzip_all_gz(paths, run):
-    if run:
-        with ThreadPoolExecutor(max_workers=10) as pool:
-            result = pool.map(unzip_one_gz, paths)
-
-@timeit_memoryusage
-def processing_all_files(paths, output_directory, run):
-    if run:
-        with ThreadPoolExecutor(max_workers=10) as pool:
-            result = pool.map(processing_one_file, paths, repeat(output_directory))
 
 def processing_one_file(file, output_directory):
     try:
@@ -93,7 +80,6 @@ def hours_worked(df):
         day_index = day_metadata[1] + day_metadata[2]
         df[day_index] = df[end_list[i]] - df[start_list[i]]
         df.drop([end_list[i], start_list[i]], inplace=True, axis=1)
-
     one_two_lists = string_in_list(df, "1")
     one_list = one_two_lists[0]
     two_list = one_two_lists[1]
