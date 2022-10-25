@@ -1,2 +1,2 @@
 # SafeGraph
-End to end data science project for safe graph data
+End to end data science project for safegraph
