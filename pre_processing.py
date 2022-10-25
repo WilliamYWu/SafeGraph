@@ -11,6 +11,7 @@ import gzip
 import shutil
 import json
 
+# TODO: This doesn't work perfectly yet for some reason. It looks like it saves the first file of every new month in the wrong folder
 def unzip_one_gz(file):
     current_folder_dir = file.rsplit('\\',maxsplit=1)[0]
     os.chdir(current_folder_dir)

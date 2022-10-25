@@ -91,9 +91,9 @@ def from_file_populate_table(file, table):
         csv_df = pd.read_csv(file, engine='c', on_bad_lines='skip').fillna('NA')
     except Exception as e:
         logging.error(f'Error on: {file}: {e}')
-    csv_df = clean(csv_df)
     sql = f"INSERT IGNORE INTO safegraph_db.{table} VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)" 
     for i, row in csv_df.iterrows():
         cursor.execute(sql, tuple(row))
         mydb.commit()
+    csv_df = clean(csv_df)
 

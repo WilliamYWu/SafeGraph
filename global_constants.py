@@ -1,4 +1,5 @@
 from datetime import datetime
+from tkinter.tix import MAIN
 
 MAIN_DIR = 'D:\\Code\\Safegraph_Project'
 DATA_DIR = MAIN_DIR + '\\SG_Data'
@@ -12,3 +13,6 @@ STAGING_1_INPUT = CLEANED_DATA_DIR + '\\staging_0_clean_data'
 
 LOG_DIR = MAIN_DIR + f"\\Log\\{datetime.now().strftime('%Y%m%d')}"
 LOG_FILE = LOG_DIR + f"\\Log_{datetime.now().strftime('%H%M%S')}.log"
+
+TESTING_DATA_DIR = MAIN_DIR + "\\Testing\\Data"
+TESTING_GRAPH_DIR = MAIN_DIR + "\\Testing\\Graphs"
